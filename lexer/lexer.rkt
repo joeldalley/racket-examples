@@ -1,15 +1,23 @@
 #! /usr/bin/env racket
 #lang racket/base
 
+; Driver for jbd/* modules.
+; Author:  Joel Dalley
+; Version: 2014/Apr/02
+
+(require racket/block)
 (require racket/string)
 (require "../modules/jbd/std-lexer.rkt")
 
-; Sample input text, which we split:
-(define text "4ab3c5")
+(define lexers (list Num Word Op))
 
-; Print input.
-(displayln text)
+(define text "1 2 4 8")
 
-; Apply standard lexers to input.
-(Num text)
-(Word text)
+(define (tokenize text)
+  (if (= (string-length text) 0)
+    '()
+    (block 
+      (define res (Num text))
+      (displayln res))))
+
+(tokenize text)
