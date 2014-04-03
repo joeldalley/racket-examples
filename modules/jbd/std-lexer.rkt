@@ -7,31 +7,39 @@
 (require racket/string)
 
 ; Export symbols.
-(provide Num Word Op)
+(provide Num Word Op Space)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Lexers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (Num text)
-  (match-to-pair text (regexp-match #px"^\\d+" text)))
+  (define r #px"^\\d+")
+  (match-to-tuple "Num" text (regexp-match r text)))
 
 (define (Word text)
-  (match-to-pair text (regexp-match #px"^\\w+" text)))
+  (define r #px"^\\w+")
+  (match-to-tuple "Word" text (regexp-match r text)))
+
+(define (Space text)
+  (define r #px"^\\s+")
+  (match-to-tuple "Space" text (regexp-match r text)))
 
 (define (Op text)
-  (match-to-pair text (regexp-match #px"^[\\+\\-\\*\\/]" text)))
+  (define r #px"^[\\+\\-\\*\\/]")
+  (match-to-tuple "Op" text (regexp-match r text)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Utilities ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Return matched text + remaining text, or the empty list.
-(define (match-to-pair text match)
-  (cond 
-    [(pair? match) (list (car match) 
-                         (substring text (string-length
-                                         (car match))))]
-    [(false? match) '()]))
+(define (match-to-list type text match)
+  (list (car match)
+        (substring text (string-length (car match)))
+        type))
+
+(define (match-to-tuple type text match)
+  (cond [(list? match) (match-to-list type text match)]
+        [(false? match) '()]))
 
 

@@ -9,15 +9,23 @@
 (require racket/string)
 (require "../modules/jbd/std-lexer.rkt")
 
-(define lexers (list Num Word Op))
+(define lexers (list Num Word Space Op))
 
 (define text "1 2 4 8")
 
-(define (tokenize text)
-  (if (= (string-length text) 0)
-    '()
-    (block 
-      (define res (Num text))
-      (displayln res))))
+(define (create-token type value) (list type value)) 
+(define (token-type token) (car token))
+(define (token-value token) (cdr token))
 
-(tokenize text)
+(define (tokenize text tokens)
+  (for-each (lambda (lexer)
+    (define res (lexer text))
+    (if (null? res)
+      tokens
+      (block
+        (define token (create-token (caddr res) (car res)))
+        (displayln (cons token tokens))
+        (tokenize (cadr res) (cons token tokens)))))
+    lexers))
+
+(tokenize text '())
