@@ -1,7 +1,7 @@
 #! /usr/bin/env racket
 #lang racket/base
 
-; Driver for jbd/* modules.
+; Driver for jbd/std-lexer.rkt.
 ; Author:  Joel Dalley
 ; Version: 2014/Apr/02
 
@@ -9,23 +9,29 @@
 (require racket/string)
 (require "../modules/jbd/std-lexer.rkt")
 
-(define lexers (list Num Word Space Op))
+; Turns input text into a (type, remaining-text, value) triplet.
+(define (lex text)
+  (cond [(not (null? (Num text)))   (Num text)]
+        [(not (null? (Word text)))  (Word text)]
+        [(not (null? (Op text)))    (Op text)]
+        [(not (null? (Space text))) (Space text)]
+        [(= 1 1) (list "DUMMY" 
+                       (if (> (string-length text) 0)
+                           (substring text 1) "") 
+                       "UNDEF")]))
 
-(define text "1 2 4 8")
-
-(define (create-token type value) (list type value)) 
-(define (token-type token) (car token))
-(define (token-value token) (cdr token))
-
+; Turns input text into a list of (type, value) pairs.
 (define (tokenize text tokens)
-  (for-each (lambda (lexer)
-    (define res (lexer text))
-    (if (null? res)
-      tokens
-      (block
-        (define token (create-token (caddr res) (car res)))
-        (displayln (cons token tokens))
-        (tokenize (cadr res) (cons token tokens)))))
-    lexers))
+  (define lexed (lex text))
+  (define token (list (caddr lexed) (car lexed)))
+  (define text-left? (> (string-length (cadr lexed)) 0))
 
-(tokenize text '())
+  (if text-left? 
+      (tokenize (cadr lexed) (cons token tokens))
+      (cons token tokens)))
+
+; Tokenize input text.
+(define token-list (tokenize "1 Foobar 4+9 Foo2" '()))
+
+; Print tokens.
+(for-each (lambda (T) (displayln T)) token-list)
