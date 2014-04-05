@@ -25,13 +25,15 @@
   (define lexed (lex text))
   (define token (list (caddr lexed) (car lexed)))
   (define text-left? (> (string-length (cadr lexed)) 0))
-
   (if text-left? 
       (tokenize (cadr lexed) (cons token tokens))
       (cons token tokens)))
 
-; Tokenize input text.
-(define token-list (tokenize "1 Foobar 4+9 Foo2" '()))
 
-; Print tokens.
+; Tokenize input text.
+(define input-text "1 Foobar 4+9 Foo2")
+(define token-list (reverse (tokenize input-text '())))
+
+; Print.
+(displayln (string-join (list "Input Text: " input-text "\n")))
 (for-each (lambda (T) (displayln T)) token-list)
