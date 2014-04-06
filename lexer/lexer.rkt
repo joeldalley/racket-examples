@@ -23,11 +23,10 @@
 ; Turns input text into a list of (type, value) pairs.
 (define (tokenize text tokens)
   (define lexed (lex text))
-  (define token (list (caddr lexed) (car lexed)))
   (define text-left? (> (string-length (cadr lexed)) 0))
-  (if text-left? 
-      (tokenize (cadr lexed) (cons token tokens))
-      (cons token tokens)))
+  (define token (list (caddr lexed) (car lexed)))
+  (define new-tokens (cons token tokens))
+  (if text-left? (tokenize (cadr lexed) new-tokens) new-tokens))
 
 
 ; Tokenize input text.
